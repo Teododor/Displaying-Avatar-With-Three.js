@@ -1,39 +1,38 @@
-const renderer = new THREE.WebGLRenderer();
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
 const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-var Mesh;
-var light;
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-function init(){
-    scene.background = new THREE.Color('black');
-    camera.position.set(0, 10, 20);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+camera.position.z = 5;
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(0, 1, 5);
+scene.add(directionalLight);
+
+const loader = new THREE.GLTFLoader();
+loader.load('ThePeasantBoss.glb', (gltf) => {
+    const model = gltf.scene;
+    scene.add(model);
+});
+
+window.addEventListener('resize', () => {
+    const newWidth = window.innerWidth;
+    const newHeight = window.innerHeight;
+
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(newWidth, newHeight);
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
 }
 
-function setLight(){
-
-}
-
-function loadGLTF(){
-    let loader = new THREE.GLTFLoaderUtils();
-
-    loader.load('/ThePeasantBoss.glb', (gltf) => {
-        Mesh = gltf.scene;
-        Mesh.scale.set(0.2,0.2,0.2);
-        scene.add(Mesh);
-        Mesh.position.x = 0;
-        Mesh.position.y = 10;
-        Mesh.position.z = 15;
-    });
-}
-
-function animate(){
-
-}
-
-init();
-setLight();
-loadGLTF();
 animate();
